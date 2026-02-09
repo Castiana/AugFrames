@@ -1,0 +1,38 @@
+## Interface: 120001, 120000
+## Title: AugFrames
+## Notes: Augmentation Evoker Helper Frames
+## Category: Combat
+## Category-deDE: Kampf
+## Category-esES: Combate
+## Category-esMX: Combate
+## Category-frFR: Combat
+## Category-itIT: Combattimento
+## Category-koKR: 전투
+## Category-ptBR: Combate
+## Category-ruRU: Бой
+## Category-zhCN: 战斗
+## Category-zhTW: 戰鬥
+## Author: Sion Duncan
+## Version: v1.0
+## SavedVariables: AugFramesDB
+## OptionalDeps: Ace3
+## IconTexture: Interface\Icons\ability_evoker_augmentation
+## X-Website: http://www.sionduncan.co.uk
+
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+
+locales\locales.xml
+
+AugFramesDB.lib.lua
+AugFrames.lib.lua
+AugFramesOptions.lib.lua
+AugFrames.lua

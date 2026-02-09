@@ -1,0 +1,24 @@
+{
+    "Lua.diagnostics.globals": [
+        "CLOSE",
+        "DEFAULT_CHAT_FRAME",
+        "SlashCmdList",
+        "hash_SlashCmdList",
+        "FONT_COLOR_CODE_CLOSE",
+        "ChatEdit_InsertLink",
+        "ACCEPT",
+        "ChatFrameUtil",
+        "NORMAL_FONT_COLOR_CODE",
+        "IsSecureCmd",
+        "NUM_CHAT_WINDOWS",
+        "ChatEdit_GetActiveWindow",
+        "ReloadUI",
+        "SELECTED_CHAT_FRAME",
+        "CANCEL",
+        "Settings",
+        "SetDesaturation",
+        "ColorPickerFrame",
+        "OKAY",
+        "NOT_BOUND"
+    ]
+}
