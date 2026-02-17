@@ -19,9 +19,6 @@
 -- 
 -- Add the DB Upgrade stuff
 -- Change the way the addon reads/writes to the DB. It's crap just now, need to make it cleaner and less entire db saving/writing
--- Fix the moving of the frame (Alt + Left click and drag instead of slash commands)
--- Add resizing of the frame (Since it didn't work the first time I wrote it. Shift + left click drag)
--- Add the ability to store group and raid targetting at the same time and swap between them based on group size
 
 
 -- Initialise the addon using Ace3. Create a global called AugFrames to hold it
@@ -39,19 +36,19 @@ function AugFrames:OnInitialize()
     AugFramesDBLibrary:Init()
     AugFramesDBLibrary:CheckDatabase()
 
-    -- Initialise our options menu
-    AugFramesOptionsLibrary:Init()
-
     -- Registering the slash commands
     AugFrames:RegisterChatCommand("augframes", function(msg) AugFramesLibrary:SlashCommand(msg) end) -- Registering the slash command. Took me a while to figure out how to pass this directly to the library function...
     AugFrames:RegisterChatCommand("af",  function(msg) AugFramesLibrary:SlashCommand(msg) end) -- Registering the shorter slash command. See above...
+    AugFrames:RegisterChatCommand("augf",  function(msg) AugFramesLibrary:SlashCommand(msg) end) -- Registering the shorter(ish) slash command. See above...
 end
 
  -- Called when the addon is enabled. This is where we register events and set up our frames.
 function AugFrames:OnEnable()
+    AugFramesLibrary:TeardownFrames() -- Getting rid of any AugFrames that maybe hanging about (No idea how they would but, but better safe than sorry)
     AugFrames:RegisterEvent("PLAYER_ENTERING_WORLD", function() AugFramesLibrary:SpecCheck("player") end) -- Register for the entering world event
     AugFrames:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", function() AugFramesLibrary:SpecCheck("player") end) -- Register for the specialization change event
-    AugFrames:RegisterEvent("GROUP_ROSTER_UPDATE", function() AugFramesLibrary:TargettingUpdate() end) -- Register for the group roster update event
+    AugFrames:RegisterEvent("GROUP_ROSTER_UPDATE", function() AugFramesLibrary:RosterUpdate() end) -- Register for the group roster update event
+    AugFrames:RegisterEvent("READY_CHECK", function() AugFramesLibrary:CheckTargetting() end) -- Register for the ready check event
 end
 
 -- Called when the addon is disabled. This is where we clean up any frames or events.
