@@ -49,13 +49,15 @@ function AugFramesDBLibrary:GetAugFramesDBDefaults()
             dbVersion = 1, -- Used to track what version of the DB has been loaded
             size = 100, -- Size of one side of the frame, since it's a square, that's all we need
             location = { "CENTER", "UIParent", "CENTER", 0, 0 }, -- Parent Frame Location
-            smartPartyTargetting = true, -- This is to control SmartTargetting when in a party
-            supressTargettingWarning = false,
+            targetinglocation = { "CENTER", "UIParent", "CENTER", 0, 0 }, -- Targeting Frame Location
+            partyAutoTargetting = true, -- This is to control SmartTargetting when in a party
+            supressTargettingWarning = false, -- Supress warnings when the player is the target
+            generatedContextMenus = false, -- Used to track if we've generated our context menu options yet or not, so we don't generate them multiple times
             areaData = { -- This holds the configuration for the 4 clickable areas
-                [1] = { type = "spell", spell = "409311", name = AFL["SpellPrescience"] , unit = "player", unitDefault = "player", icon = 5199639, location = "TOPLEFT"}, -- Top Left
-                [2] = { type = "spell", spell = "409311", name = AFL["SpellPrescience"] , unit = "player", unitDefault = "player", icon = 5199639, location = "TOPRIGHT"}, -- Top Right
-                [3] = { type = "spell", spell = "360827", name = AFL["SpellBlisteringScales"] , unit = "player", unitDefault = "player", icon = 5199621, location = "BOTTOMLEFT"}, -- Bottom Left
-                [4] = { type = "spell", spell = "406732", name = AFL["SpellSpatialVortex"] , unit = "player", unitDefault = "player", icon = 5199645, location = "BOTTOMRIGHT"}, -- Bottom Right
+                [1] = { type = "spell", spell = "409311", name = AFL["SpellPrescience"] , unit = "player", playerName = "player", icon = 5199639, location = "TOPLEFT"}, -- Top Left
+                [2] = { type = "spell", spell = "409311", name = AFL["SpellPrescience"] , unit = "player", playerName = "player", icon = 5199639, location = "TOPRIGHT"}, -- Top Right
+                [3] = { type = "spell", spell = "360827", name = AFL["SpellBlisteringScales"] , unit = "player", playerName = "player", icon = 5199621, location = "BOTTOMLEFT"}, -- Bottom Left
+                [4] = { type = "spell", spell = "406732", name = AFL["SpellSpatialVortex"] , unit = "player", playerName = "player", icon = 5199645, location = "BOTTOMRIGHT"}, -- Bottom Right
             },
         },
 	}

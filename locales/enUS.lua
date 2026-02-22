@@ -29,6 +29,14 @@ if L then
 	L["SpellBlisteringScales"] = "Blistering Scales"
 	L["SpellSpatialVortex"] = "Spatial Vortex"
 
+	L["ContextMenuSetTarget"] = "Set as Target"
+
+	L["TargetingFrameTitle"] = "AugFrames Targeting"
+
+	L["DropDownMenuSelectTarget"] = "Select Target"
+
+	L["Targets"] = "targets"
+
 	L["TargettingCheckPlayerTargetted"] = " is currently targetting you!"
 
 	L["DBVersionCurrent"] = "Up to date!"

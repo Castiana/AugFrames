@@ -12,8 +12,8 @@
 
 AugFramesLibrary = {} -- Creating the global library variable
 
--- Handy debug function. Thanks Github CoPilot for this.
 function AugFramesLibrary:DumpTable(tbl, indent)
+    -- Handy debug function. Thanks Github CoPilot for this.
     indent = indent or ""
     for k, v in pairs(tbl) do
         if type(v) == "table" then
@@ -25,8 +25,9 @@ function AugFramesLibrary:DumpTable(tbl, indent)
     end
 end
 
--- Handles all slash commands
+
 function AugFramesLibrary:SlashCommand(msg)
+    -- Handles all slash commands
 	-- I "acquired" this trim function from WillsCDM. Utterly no idea how it works, I don't do regex... <3 Will
 	local function trim(str)
 		if str == nil then
@@ -61,6 +62,11 @@ function AugFramesLibrary:SlashCommand(msg)
     elseif cleanMessage == "posdb" then -- For Debugging. Leaving in live incase the user wants to see
         local point, relativeTo, relativePoint, axisX, axisY = unpack(tmpDB.profile.location) -- Get the saved location from the DB
         print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. AFL["PoSFrameDBLocation"] .. ": " .. point .. ", " .. AFL["RelativeTo"] .. ": " .. relativeTo .. ", " .. AFL["RelativePoint"] .. ": " .. relativePoint .. ", X: " .. axisX .. ", Y: " .. axisY) -- Print the position to the user
+    elseif cleanMessage == "dumpTargeting" or cleanMessage == "dumpTargets" or cleanMessage == "targets" then
+        for i = 1, 4 do
+            local areaDBSettings = tmpDB.profile.areaData[i] -- Get the settings for this area from the DB
+            print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. areaDBSettings.name .. " " .. AFL["Targets"] .. ": " .. areaDBSettings.unit) -- Print the targetting info for this clickable area to the user
+        end
     elseif cleanMessage == "dumpdb" then
         AugFramesLibrary:DumpTable(tmpDB) -- Dump the DB to the user for debugging
     elseif cleanMessage == "status" then
@@ -89,8 +95,8 @@ function AugFramesLibrary:ResetFramePosition()
     AugFramesDBLibrary:SetDB(tmpDB) -- Set the DB with the new position
 end
 
--- Clickable area creation function
 function AugFramesLibrary:CreateClickableArea(areaIndex)
+    -- Clickable area creation function
     if areaIndex < 1 or areaIndex > 4 then return end -- Sanity check to make sure the area index is between 1 and 4
 
     local AugFramesMain = _G["AugFramesMainFrame"] -- Get the main frame to use as the parent for the clickable areas
@@ -114,7 +120,7 @@ function AugFramesLibrary:CreateClickableArea(areaIndex)
             areaFrame:SetAttribute(k, v) -- Set the attribute on the clickable area
         elseif k == "unit" then
             if v == "" or v == nil then
-                areaFrame:SetAttribute("unit", areaDBSettings.unitDefault) -- This should NEVER be triggered, but rather have it than not incase something goes horribly wrong
+                areaFrame:SetAttribute("unit", "player") -- This should NEVER be triggered, but rather have it than not incase something goes horribly wrong
             else
                 areaFrame:SetAttribute("unit", areaDBSettings.unit) -- Targetting the spell
             end
@@ -222,116 +228,6 @@ function AugFramesLibrary:UpdateTargetting(unit, role)
     AugFramesDBLibrary:SetDB(tmpDB) -- Set the DB with the new targetting info
 end
 
-function AugFramesLibrary:GenerateContextMenuText(unit)
-    -- Since "player" isn't a valid menu option we need to convert it to "SELF". This is REALLY dumb...
-    if unit == "SELF" then unit = "player" end
-
-    if not unit or not UnitExists(unit) then return "" end -- Sanity check to make sure the unit exists, if it doesn't exist somethings gone wrong
-
-    local role = "NONE"
-    if unit == "player" and not IsInGroup() and not IsInRaid() then
-        role = GetSpecializationRole(C_SpecializationInfo.GetSpecialization()) -- If the player is solo, get there role based on their specializationID
-    else
-        role = UnitGroupRolesAssigned(unit) -- Get the role assigned to the unit by the game (TANK, HEALER, DAMAGER or NONE)
-    end
-
-    local outputText = ""
-
-    if role == "TANK" then
-        -- Tank Role
-        outputText = AFL["ContextMenuSetTank"]
-    elseif role == "HEALER" then 
-        -- Healer
-        outputText = AFL["ContextMenuSetHealer"]
-    elseif role == "DAMAGER" then
-        -- DPS
-        outputText = AFL["ContextMenuSetDPS"]
-    else
-        -- No Role, player is not in a group
-        outputText = AFL["ContextMenuSetNone"]
-    end
-
-    return outputText, role -- Return the generated text and the role for use in the context menu
-end
-
-function AugFramesLibrary:GenerateContextMenu()
-    -- Inserting the context menu into the player context menu
-    AugFramesLibrary:InsertContextMenuItem("SELF")
-
-    if IsInGroup() then
-        -- Group Context Menu
-        local groupMembers = GetNumGroupMembers() -- Get the number of members in the group
-        for i = 1, groupMembers do
-            local unit = "party" .. i -- Get the unit ID for this party member
-            if UnitExists(unit) then
-                AugFramesLibrary:InsertContextMenuItem(unit) -- Insert the context menu item for this party member
-            end
-        end
-    elseif IsInRaid() then
-        -- Raid Context Menu
-        local groupMembers = GetNumGroupMembers() -- Get the number of members in the group
-        for i = 1, groupMembers do
-            local unit = "raid" .. i -- Get the unit ID for this raid member
-            if UnitExists(unit) then
-                AugFramesLibrary:InsertContextMenuItem(unit) -- Insert the context menu item for this raid member
-            end
-        end
-    end
-end
-
-function AugFramesLibrary:InsertContextMenuItem(unit)
-    if not unit then return end -- Sanity check to make sure the unit exists, if it doesn't exist somethings gone wrong
-
-    local menuText, role = AugFramesLibrary:GenerateContextMenuText(unit) -- Generate the context menu text for this unit
-
-    Menu.ModifyMenu("MENU_UNIT_"..unit, function(owner, rootDescription, contextData)
-        rootDescription:CreateDivider() -- Create a divider in the context menu to separate our options from the default options
-        rootDescription:CreateTitle(AFL["AddonName"]) -- Create a title for our options in the context menu with the addon name
-        rootDescription:CreateButton(menuText, function() AugFramesLibrary:UpdateTargetting(contextData.unit, role) end) -- Create a button in the context menu with the generated text and run the targetting for that button text
-    end)
-end
-
-function AugFramesLibrary:RosterUpdate()
-    if AugFramesDBLibrary:IsEnabled() == false then return end -- If the addon is not enabled, do nothing
-
-    if IsInGroup() then
-        local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
-        if tmpDB.profile.partyAutoTargetting == true then -- If the Auto/Smart Party Targetting is enabled, then update the targetting for the party members
-            for i = 1, GetNumGroupMembers()  do
-                local unit = "party" .. i -- Get the unit ID for this party member
-                if UnitExists(unit) then
-                    AugFramesLibrary:UpdateTargetting(unit, UnitGroupRolesAssigned(unit)) -- Set the target for Blisting Scales to the tank in the group
-                end
-            end
-        end
-    elseif IsInRaid() then
-        AugFramesLibrary:GenerateContextMenu() -- Regenerate the context menu to include/remove 
-    end
-end
-
-function AugFramesLibrary:CheckTargetting()
-    local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
-
-    for i = 1, 4 do
-        local targetUnit = tmpDB.profile.areaData[i].unit -- Get the unit assigned to this area
-        if targetUnit ~= "player" then
-            if tmpDB.profile.supressTargettingWarning ~= false then
-                print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. tmpDB.profile.areaData[i].name ..  AFL["TargettingCheckPlayerTargetted"]) -- Let the user know we're checking the targetting for this unit
-            end
-        end
-    end
-end
-
--- This is the "main loop", it'll handle the frame setup/teardown based on the players spec
-function AugFramesLibrary:Main()
-    if AugFramesDBLibrary:IsEnabled() == true then
-        AugFramesLibrary:GenerateContextMenu() -- Generate the context menu options
-        AugFramesLibrary:SetupFrames() -- If the addon is enabled, set up the frames
-    else
-        AugFramesLibrary:TeardownFrames() -- If the addon is disabled, tear down the frames
-    end
-end
-
 function AugFramesLibrary:SpecCheck(unit)
 	if unit and unit ~= "player" then return end -- Simple 1 liner, if the unit passed is not the player, then do nothing 
 
@@ -352,4 +248,219 @@ function AugFramesLibrary:SpecCheck(unit)
 
     -- Run the main loop
     AugFramesLibrary:Main()
+end
+
+function AugFramesLibrary:RosterUpdate()
+    if AugFramesDBLibrary:IsEnabled() == false then return end -- If the addon is not enabled, do nothing
+ 
+    local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+
+    if IsInGroup() then
+        if tmpDB.profile.partyAutoTargetting == true then -- If the Auto/Smart Party Targetting is enabled, then update the targetting for the party members
+            for i = 1, GetNumGroupMembers()  do
+                local unit = "PARTY" .. i -- Get the unit ID for this party member
+                if UnitExists(unit) then
+                    AugFramesLibrary:UpdateTargetting(unit, UnitGroupRolesAssigned(unit)) -- Set the target for Blisting Scales to the tank in the group
+                end
+            end
+        else
+            AugFramesLibrary:CheckTargetting()
+        end
+    else
+        AugFramesLibrary:CheckTargetting()
+    end
+end
+
+function AugFramesLibrary:CheckTargetting()
+    local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+
+    for i = 1, 4 do
+        local targetUnitDB = tmpDB.profile.areaData[i].unit -- Get the unit assigned
+        local targetNameDB = tmpDB.profile.areaData[i].playerName -- Get the player name assigned
+
+        local playerRealm = GetNormalizedRealmName() -- Get the players realm
+        local targetName, targetRealm = UnitFullName(targetUnitDB) -- Get the name of the assigned unit
+
+        if not targetRealm then targetRealm = playerRealm end -- If the target realm is nil, set it to the players realm (This should only happen for player units)
+
+        if targetNameDB ~= targetName .. targetRealm then
+            -- The unit that is stored in the DB is incorrect, lets find the correct unitID
+            if IsInGroup() then
+                for j = 1, GetNumGroupMembers() do
+                    local unit = "PARTY" .. j -- Get the unit ID for this party member
+                    if UnitExists(unit) then
+                        local name, realm = UnitFullName(unit)
+                        if not realm then realm = playerRealm end
+                        if name .. realm == targetNameDB then
+                            tmpDB.profile.areaData[i].unit = unit -- Update the DB with the correct unit ID
+                            break
+                        end
+                    end
+                end
+            elseif IsInRaid() then
+                for j = 1, GetNumGroupMembers() do
+                    local unit = "RAID" .. j -- Get the unit ID for this raid member
+                    if UnitExists(unit) then
+                        local name, realm = UnitFullName(unit)
+                        if not realm then realm = playerRealm end
+                        if name .. realm == targetNameDB then
+                            tmpDB.profile.areaData[i].unit = unit -- Update the DB with the correct unit ID
+                            break
+                        end
+                    end
+                end
+            else
+                -- Player is solo, so we can just set the unit to player if the names don't match, since that's the only option.
+                tmpDB.profile.areaData[i].unit = "player" -- Update the DB with the correct unit ID
+            end
+        end
+    end
+
+    AugFramesDBLibrary:SetDB(tmpDB) -- Set the DB with the new unit ID
+end
+
+function AugFramesLibrary:Main()
+    -- This is the "main loop", it'll handle the frame setup/teardown based on the players spec
+    if AugFramesDBLibrary:IsEnabled() == true then
+        AugFramesLibrary:GenerateContextMenus() -- Generate the context menu options
+        AugFramesLibrary:SetupFrames() -- If the addon is enabled, set up the frames
+    else
+        AugFramesLibrary:TeardownFrames() -- If the addon is disabled, tear down the frames
+    end
+end
+
+function AugFramesLibrary:GenerateContextMenus()
+    local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+    if tmpDB.profile.generatedContextMenus == true then return end -- If we've already generated the context menu options, do nothing to avoid generating them multiple times
+    local function InsertMenu(unit)
+        unit = string.upper(unit) -- Better safe than sorry with this
+        Menu.ModifyMenu("MENU_UNIT_" .. unit, function(owner, rootDescription, contextData)
+            rootDescription:CreateDivider() -- Create a divider in the context menu to separate our options from the default options
+            rootDescription:CreateTitle(AFL["AddonName"]) -- Create a title for our options in the context menu with the addon name
+            rootDescription:CreateButton(AFL["ContextMenuSetTarget"], function() AugFramesLibrary:TargettingFrame() end) -- Create a button in the context menu with the generated text and run the targetting for that button text
+        end)
+    end
+
+    -- Creating the player context menu first
+    InsertMenu("SELF")
+
+    -- I feel dirty for doing it like this, but I could not get the context menus to work any other way....
+    for i = 1, 4 do
+        local unit = "PARTY" .. i
+        if UnitExists(unit) then
+            InsertMenu(unit)
+        end
+    end
+
+    for i = 1, 40 do
+        local unit = "RAID" .. i
+        if UnitExists(unit) then
+            InsertMenu(unit)
+        end
+    end
+
+    tmpDB.profile.generatedContextMenus = true -- Set this to true so we don't generate the context menu options multiple times
+    AugFramesDBLibrary:SetDB(tmpDB) -- Set the DB with the new generatedContextMenus value
+end
+
+function AugFramesLibrary:TargettingFrame()
+    -- This is a frame that will contain 4 drop down boxes, one for each of the clickable areas.
+    -- The player will pick what target (via player name) they want each spell to target.
+    -- Since this code is not needed anywhere out than this function, we're adding it as a local function
+    local function DraggingFrameStart(TargetingFrame) -- Used to start dragging the frame
+            TargetingFrame:StartMoving()
+    end
+
+    local function DraggingFrameStop(TargetingFrame) -- Used to stop dragging the frame, and saving it's location
+        TargetingFrame:StopMovingOrSizing()
+        local point, relativeTo, relativePoint, axisX, axisY = TargetingFrame:GetPoint() -- Get the new position of the frame
+        local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+        tmpDB.profile.targetinglocation = {point, "UIParent", relativePoint, axisX, axisY} -- Save the new position to the DB
+        AugFramesDBLibrary:SetDB(tmpDB) -- Set the DB with the new position
+    end
+
+    local function DestroyFrame(TargetingFrame) -- Used to destroy the frame when we're done with it
+        TargetingFrame:Hide() -- Hide the frame
+        TargetingFrame:SetParent(nil) -- Detach the frame from its parent
+        _G["AugFramesTargettingFrame"] = nil -- Set the frame to nil to free up memory
+    end
+
+    local function GenerateDropdown(parentFrame, labelText, offsetY)
+        local dropdownLabel = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal") -- Creating the text label for the dropdown
+        dropdownLabel:SetPoint("TOPLEFT", 20, offsetY) -- Setting the title location
+        dropdownLabel:SetText(labelText) -- Setting the title text
+
+        local dropdownFrame = CreateFrame("Frame", nil, parentFrame, "UIDropDownMenuTemplate") -- Creating the frame to hold the dropdown menu
+        dropdownFrame:SetPoint("LEFT", dropdownLabel, "LEFT", 60, -3) -- Setting the dropdown location
+
+        UIDropDownMenu_SetWidth(dropdownFrame, 150) -- Setting the width of the dropdown menu
+        UIDropDownMenu_SetText(dropdownFrame, AFL["DropDownMenuSelectTarget"]) -- Setting the default text of the dropdown menu
+
+        UIDropDownMenu_Initialize(dropdownFrame, function(self, level, menuList) -- Generate the content of the dropdown menu
+            local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+            local playerRealm = GetNormalizedRealmName() -- Get the players realm
+
+            local function addUnitToDropdown(unit) -- Local function, since we only use it in this function in this function, we create it locally
+                if UnitExists(unit) then -- Check if the unit exists, should be player, party or raid. 
+                    local name, realm = UnitFullName(unit) -- Get the name and realm of the unit 
+                    if not realm then realm = playerRealm end -- Checking to make sure there is a realm name present, if not. It's a "local" unit, set it to the same as the player
+                    local fullName = name .. "-" .. realm -- Creating the full name
+                    local info = UIDropDownMenu_CreateInfo() -- Creating dropdown item
+                    info.text = fullName -- Setting the text of the dropdown item
+                    info.func = function() -- Setting what happens when the player clicks the meny item
+                        UIDropDownMenu_SetText(dropdownFrame, fullName)
+                        AugFramesLibrary:UpdateTargetting(unit, labelText) -- Update the targetting for this area with the selected unit and role
+                    end
+                    UIDropDownMenu_AddButton(info)
+                end
+            end
+
+            addUnitToDropdown("player") -- Add the player to the dropdown first
+
+            if IsInGroup() then
+                for i = 1, GetNumGroupMembers() do
+                    addUnitToDropdown("PARTY" .. i) -- Add party members to the dropdown
+                end
+            elseif IsInRaid() then
+                for i = 1, GetNumGroupMembers() do
+                    addUnitToDropdown("RAID" .. i) -- Add raid members to the dropdown
+                end
+            end
+        end)
+    end
+
+    local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+    local TargetingFrame = CreateFrame("Frame", "AugFramesTargettingFrame", UIParent, "BackdropTemplate") -- Create the frame for the targetting options
+    TargetingFrame:SetPoint(unpack(tmpDB.profile.targetinglocation)) -- Set the position of the frame to the center of the screen
+    TargetingFrame:SetSize(290, 230) -- Set the size of the frame
+    TargetingFrame:SetMovable(true) -- Setting the frame ot be movable
+    TargetingFrame:EnableMouse(true) -- Setting the frame to interact with the mouse
+    TargetingFrame:RegisterForDrag("LeftButton") -- Setting the frame to be draggable with the left mouse button
+    TargetingFrame:SetScript("OnDragStart", function() DraggingFrameStart(TargetingFrame) end) -- Set the script to start dragging the frame when the player starts dragging
+    TargetingFrame:SetScript("OnDragStop", function() DraggingFrameStop(TargetingFrame) end) -- Set the script to stop dragging the frame when the player stops dragging
+    TargetingFrame:SetScript("OnHide", function() DestroyFrame(TargetingFrame) end) -- Set the script to destroy the frame when it's hidden
+    TargetingFrame:SetBackdrop({ -- Setting the backdrop of the frame to make it look like a standard WoW dialog
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", -- Background texture
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", -- Border texture
+        tile = true,
+        tileSize = 32,
+        edgeSize = 32,
+        insets = { left = 8, right = 8, top = 8, bottom = 8 },
+    })
+
+    local closeButton = CreateFrame("Button", nil, TargetingFrame, "UIPanelCloseButton") -- Creating the close button frame
+    closeButton:SetPoint("TOPRIGHT", TargetingFrame, "TOPRIGHT", -5, -5) -- Setting it to the top right of the frame
+    closeButton:SetScript("OnClick", function() DestroyFrame(TargetingFrame) end) -- When clicked, destroy the frame
+
+    local TargetingFrameTitle = TargetingFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge") -- Creating the title for the frame
+    TargetingFrameTitle:SetPoint("TOP", 0, -12) -- Setting the position of the title to the top of the frame
+    TargetingFrameTitle:SetText(AFL["TargetingFrameTitle"]) -- Setting the title text
+
+    NineSliceUtil.ApplyLayout(TargetingFrame, NineSliceLayouts.Dialog) -- Applying the default dialog nine slice layout to the frame to make it look like a standard WoW dialog
+    GenerateDropdown(TargetingFrame, "TANK", -40) -- Blisting Scales Drowndown
+    GenerateDropdown(TargetingFrame, "HEALER", -90) -- Spatial Vortex Dropdown
+    GenerateDropdown(TargetingFrame, "DAMAGER", -140) -- Prescience Dropdown (Since we have 2 prescience areas, they will both be updated when the player selects a target for either of them, so we don't need 2 separate dropdowns for them)
+    GenerateDropdown(TargetingFrame, "NONE", -190) -- Prescience Dropdown (Since we have 2 prescience areas, they will both be updated when the player selects a target for either of them, so we don't need 2 separate dropdowns for them)
+
+    tinsert(UISpecialFrames, "AugFramesTargettingFrame") -- Inserting the frame into the SpecialFrames table, this lets the frame be closed using the escape key like any other blizzard frame
 end
