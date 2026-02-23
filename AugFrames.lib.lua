@@ -25,7 +25,6 @@ function AugFramesLibrary:DumpTable(tbl, indent)
     end
 end
 
-
 function AugFramesLibrary:SlashCommand(msg)
     -- Handles all slash commands
 	-- I "acquired" this trim function from WillsCDM. Utterly no idea how it works, I don't do regex... <3 Will
@@ -36,7 +35,7 @@ function AugFramesLibrary:SlashCommand(msg)
         return (str:gsub("^%s+", ""):gsub("%s+$", ""))
 	end
 
-	local cleanMessage = trim(msg) -- Clean any extra spacing from the message
+	local cleanMessage = string.lower(trim(msg)) -- Clean any extra spacing from the message
     local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
     local AugFramesMain = _G["AugFramesMainFrame"] -- Get the main frame
 
@@ -50,7 +49,7 @@ function AugFramesLibrary:SlashCommand(msg)
         print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. AFL["PositionResetComplete"]) -- Let the user know the position has been reset
 	elseif cleanMessage == "spec" then
 		print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. AFL["SlashCurrentSpecID"] .. ": " .. (C_SpecializationInfo.GetSpecializationInfo(C_SpecializationInfo.GetSpecialization()) or AFL["None"])) -- Tells the user what their current specID is, or none if they are not in a spec (Pre-lvl 10)
-    elseif (cleanMessage == "version" or cleanMessage == "dbVersion") then
+    elseif (cleanMessage == "version" or cleanMessage == "dbversion") then
         print("|cff33937F" .. AFL["AddonName"] .. ":|r" .. AFL["AddonVersionLong"] .. " -- " .. AFL["AddonDBVersion"] .. " " .. tmpDB.profile.dbVersion) -- Tells the user the addon version. Useful for debugging and support. 
     elseif cleanMessage == "resetdb" then
         AugFramesDBLibrary:ResetDB() -- Resets the DB to default values
@@ -62,10 +61,10 @@ function AugFramesLibrary:SlashCommand(msg)
     elseif cleanMessage == "posdb" then -- For Debugging. Leaving in live incase the user wants to see
         local point, relativeTo, relativePoint, axisX, axisY = unpack(tmpDB.profile.location) -- Get the saved location from the DB
         print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. AFL["PoSFrameDBLocation"] .. ": " .. point .. ", " .. AFL["RelativeTo"] .. ": " .. relativeTo .. ", " .. AFL["RelativePoint"] .. ": " .. relativePoint .. ", X: " .. axisX .. ", Y: " .. axisY) -- Print the position to the user
-    elseif cleanMessage == "dumpTargeting" or cleanMessage == "dumpTargets" or cleanMessage == "targets" then
+    elseif cleanMessage == "dumptargeting" or cleanMessage == "dumptargets" or cleanMessage == "targets" or cleanMessage == "dumptargets" then
         for i = 1, 4 do
             local areaDBSettings = tmpDB.profile.areaData[i] -- Get the settings for this area from the DB
-            print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. areaDBSettings.name .. " " .. AFL["Targets"] .. ": " .. areaDBSettings.unit) -- Print the targetting info for this clickable area to the user
+            print("|cff33937F" .. AFL["AddonName"] .. ":|r " .. areaDBSettings.name .. " " .. AFL["Targets"] .. ": " .. areaDBSettings.unit .. " (" .. areaDBSettings.playerName .. ")") -- Print the targetting info for this clickable area to the user
         end
     elseif cleanMessage == "dumpdb" then
         AugFramesLibrary:DumpTable(tmpDB) -- Dump the DB to the user for debugging
@@ -203,25 +202,36 @@ function AugFramesLibrary:TeardownFrames()
     end
 end
 
+function AugFramesLibrary:GetFixedName(unit)
+    local playerRealm = GetNormalizedRealmName() -- Get the players realm
+    local name, realm = UnitFullName(unit) -- Get the unit's name and realm
+    if not realm then realm = playerRealm end -- If not realm is present, it's the same as the players realm, set it.
+    return name .. "-" .. realm
+end
+
 function AugFramesLibrary:UpdateTargetting(unit, role)
     local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+    local unitName = AugFramesLibrary:GetFixedName(unit) -- Get the fixed name of the unit
 
     if role == "TANK" then
         -- Tank Role
         tmpDB.profile.areaData[3].unit = unit -- Set the target for Blisting Scales to the selected unit
+        tmpDB.profile.areaData[3].playerName = unitName -- Set the player name for Blistering Scales
     elseif role == "HEALER" then
         -- Healer
         tmpDB.profile.areaData[4].unit = unit -- Set the target for Spatial Vortex to the selected unit
+        tmpDB.profile.areaData[4].playerName = unitName -- Set the player name for Spatial Vortex
     elseif role == "DAMAGER" then
         -- DPS
         if tmpDB.profile.areaData[1].unit == unit then
             tmpDB.profile.areaData[2].unit = unit -- Set the target for the first Prescience to the selected unit
+            tmpDB.profile.areaData[2].playerName = unitName -- Set the player name for the second Prescience
         elseif tmpDB.profile.areaData[2].unit == unit then
             tmpDB.profile.areaData[1].unit = unit -- Set the target for the second Prescience to the selected unit
+            tmpDB.profile.areaData[1].playerName = unitName -- Set the player name for the first Prescience
         else
-            -- This is just a catch all. Should never really be reached. But better safe than sorry.
-            tmpDB.profile.areaData[1].unit = "player" -- Set the target for the first Prescience to the selected unit
-            tmpDB.profile.areaData[2].unit = "player" -- Set the target for the second Prescience to the selected unit
+            tmpDB.profile.areaData[1].unit = unit -- Set the target for the second Prescience to the selected unit
+            tmpDB.profile.areaData[1].playerName = unitName -- Set the player name for the first Prescience
         end
     end
 
@@ -252,7 +262,7 @@ end
 
 function AugFramesLibrary:RosterUpdate()
     if AugFramesDBLibrary:IsEnabled() == false then return end -- If the addon is not enabled, do nothing
- 
+
     local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
 
     if IsInGroup() then
@@ -261,6 +271,7 @@ function AugFramesLibrary:RosterUpdate()
                 local unit = "PARTY" .. i -- Get the unit ID for this party member
                 if UnitExists(unit) then
                     AugFramesLibrary:UpdateTargetting(unit, UnitGroupRolesAssigned(unit)) -- Set the target for Blisting Scales to the tank in the group
+                    AugFramesLibrary:CheckTargetting()
                 end
             end
         else
