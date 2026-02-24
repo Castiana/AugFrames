@@ -41,6 +41,12 @@ function AugFramesDBLibrary:ResetDB()
     AugFramesDBLibrary:SetDB(AugFramesDBLibrary:GetAugFramesDBDefaults())
 end
 
+function AugFramesDBLibrary:SetContextMenuStatus(value)
+    local db = AugFramesDBLibrary:GetDB()
+    db.profile.generatedContextMenus = value
+    AugFramesDBLibrary:SetDB(db)
+end
+
 -- Creating an array of defaults incase we have no existing DB
 function AugFramesDBLibrary:GetAugFramesDBDefaults()
 	return {

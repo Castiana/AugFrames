@@ -31,6 +31,10 @@ if L then
 
 	L["ContextMenuSetTarget"] = "Set as Target"
 
+	L["TargetingFrameTANK"] = "Tank"
+	L["TargetingFrameHEALER"] = "Healer"
+	L["TargetingFrameDAMAGER"] = "DPS"
+
 	L["TargetingFrameTitle"] = "AugFrames Targeting"
 
 	L["DropDownMenuSelectTarget"] = "Select Target"

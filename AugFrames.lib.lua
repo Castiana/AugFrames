@@ -300,9 +300,8 @@ function AugFramesLibrary:CheckTargetting()
                 for j = 1, GetNumGroupMembers() do
                     local unit = "PARTY" .. j -- Get the unit ID for this party member
                     if UnitExists(unit) then
-                        local name, realm = UnitFullName(unit)
-                        if not realm then realm = playerRealm end
-                        if name .. realm == targetNameDB then
+                        local unitName = AugFramesLibrary:GetFixedName(unit) -- Get the fixed name of the unit
+                        if unitName == targetNameDB then
                             tmpDB.profile.areaData[i].unit = unit -- Update the DB with the correct unit ID
                             break
                         end
@@ -312,9 +311,8 @@ function AugFramesLibrary:CheckTargetting()
                 for j = 1, GetNumGroupMembers() do
                     local unit = "RAID" .. j -- Get the unit ID for this raid member
                     if UnitExists(unit) then
-                        local name, realm = UnitFullName(unit)
-                        if not realm then realm = playerRealm end
-                        if name .. realm == targetNameDB then
+                        local unitName = AugFramesLibrary:GetFixedName(unit) -- Get the fixed name of the unit
+                        if unitName == targetNameDB then
                             tmpDB.profile.areaData[i].unit = unit -- Update the DB with the correct unit ID
                             break
                         end
@@ -333,6 +331,7 @@ end
 function AugFramesLibrary:Main()
     -- This is the "main loop", it'll handle the frame setup/teardown based on the players spec
     if AugFramesDBLibrary:IsEnabled() == true then
+        AugFramesDBLibrary:SetContextMenuStatus(false) -- Set this to false so we can generate the context menu
         AugFramesLibrary:GenerateContextMenus() -- Generate the context menu options
         AugFramesLibrary:SetupFrames() -- If the addon is enabled, set up the frames
     else
@@ -370,7 +369,7 @@ function AugFramesLibrary:GenerateContextMenus()
         end
     end
 
-    tmpDB.profile.generatedContextMenus = true -- Set this to true so we don't generate the context menu options multiple times
+    AugFramesDBLibrary:SetContextMenuStatus(true) -- Set this to true so we don't generate the context menu options multiple times
     AugFramesDBLibrary:SetDB(tmpDB) -- Set the DB with the new generatedContextMenus value
 end
 
@@ -399,7 +398,7 @@ function AugFramesLibrary:TargettingFrame()
     local function GenerateDropdown(parentFrame, labelText, offsetY)
         local dropdownLabel = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal") -- Creating the text label for the dropdown
         dropdownLabel:SetPoint("TOPLEFT", 20, offsetY) -- Setting the title location
-        dropdownLabel:SetText(labelText) -- Setting the title text
+        dropdownLabel:SetText(AFL["TargetingFrame".. labelText]) -- Setting the title text
 
         local dropdownFrame = CreateFrame("Frame", nil, parentFrame, "UIDropDownMenuTemplate") -- Creating the frame to hold the dropdown menu
         dropdownFrame:SetPoint("LEFT", dropdownLabel, "LEFT", 60, -3) -- Setting the dropdown location
@@ -407,34 +406,52 @@ function AugFramesLibrary:TargettingFrame()
         UIDropDownMenu_SetWidth(dropdownFrame, 150) -- Setting the width of the dropdown menu
         UIDropDownMenu_SetText(dropdownFrame, AFL["DropDownMenuSelectTarget"]) -- Setting the default text of the dropdown menu
 
-        UIDropDownMenu_Initialize(dropdownFrame, function(self, level, menuList) -- Generate the content of the dropdown menu
-            local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
-            local playerRealm = GetNormalizedRealmName() -- Get the players realm
+        UIDropDownMenu_Initialize(dropdownFrame, function() -- Generate the content of the dropdown menu
 
-            local function addUnitToDropdown(unit) -- Local function, since we only use it in this function in this function, we create it locally
+            local function addUnitToDropdown(unit, unitType) -- Local function, since we only use it in this function in this function, we create it locally
                 if UnitExists(unit) then -- Check if the unit exists, should be player, party or raid. 
-                    local name, realm = UnitFullName(unit) -- Get the name and realm of the unit 
-                    if not realm then realm = playerRealm end -- Checking to make sure there is a realm name present, if not. It's a "local" unit, set it to the same as the player
-                    local fullName = name .. "-" .. realm -- Creating the full name
+                    local tmpDB = AugFramesDBLibrary:GetDB() -- Get the DB
+                    local fullName = AugFramesLibrary:GetFixedName(unit) -- Get the fixed name of the unit to compare against the DB and display in the dropdown menu
+
                     local info = UIDropDownMenu_CreateInfo() -- Creating dropdown item
+
+                    -- Messy way to do this, but theres no switch in lua apparently...
+                    if unitType == "TANK" then
+                        if tmpDB.profile.areaData[3].playerName == fullName then -- Set the player name for Blisting Scales
+                            info.checked = true
+                        end
+                    elseif unitType == "HEALER" then
+                        if tmpDB.profile.areaData[4].playerName == fullName then -- Set the player name for Spatial Vortex
+                            info.checked = true
+                        end
+                    elseif unitType == "DAMAGER" then
+                        if tmpDB.profile.areaData[1].playerName == fullName then
+                            info.checked = true
+                        elseif tmpDB.profile.areaData[2].playerName == fullName then
+                            info.checked = true
+                        else
+                            info.checked = false
+                        end
+                    end
+
                     info.text = fullName -- Setting the text of the dropdown item
                     info.func = function() -- Setting what happens when the player clicks the meny item
                         UIDropDownMenu_SetText(dropdownFrame, fullName)
-                        AugFramesLibrary:UpdateTargetting(unit, labelText) -- Update the targetting for this area with the selected unit and role
+                        AugFramesLibrary:UpdateTargetting(unit, unitType) -- Update the targetting for this area with the selected unit and role
                     end
                     UIDropDownMenu_AddButton(info)
                 end
             end
 
-            addUnitToDropdown("player") -- Add the player to the dropdown first
+            addUnitToDropdown("player", labelText) -- Add the player to the dropdown first
 
             if IsInGroup() then
                 for i = 1, GetNumGroupMembers() do
-                    addUnitToDropdown("PARTY" .. i) -- Add party members to the dropdown
+                    addUnitToDropdown("PARTY" .. i, labelText) -- Add party members to the dropdown
                 end
             elseif IsInRaid() then
                 for i = 1, GetNumGroupMembers() do
-                    addUnitToDropdown("RAID" .. i) -- Add raid members to the dropdown
+                    addUnitToDropdown("RAID" .. i, labelText) -- Add raid members to the dropdown
                 end
             end
         end)
@@ -471,7 +488,7 @@ function AugFramesLibrary:TargettingFrame()
     GenerateDropdown(TargetingFrame, "TANK", -40) -- Blisting Scales Drowndown
     GenerateDropdown(TargetingFrame, "HEALER", -90) -- Spatial Vortex Dropdown
     GenerateDropdown(TargetingFrame, "DAMAGER", -140) -- Prescience Dropdown (Since we have 2 prescience areas, they will both be updated when the player selects a target for either of them, so we don't need 2 separate dropdowns for them)
-    GenerateDropdown(TargetingFrame, "NONE", -190) -- Prescience Dropdown (Since we have 2 prescience areas, they will both be updated when the player selects a target for either of them, so we don't need 2 separate dropdowns for them)
+    GenerateDropdown(TargetingFrame, "DAMAGER", -190) -- Prescience Dropdown (Since we have 2 prescience areas, they will both be updated when the player selects a target for either of them, so we don't need 2 separate dropdowns for them)
 
     tinsert(UISpecialFrames, "AugFramesTargettingFrame") -- Inserting the frame into the SpecialFrames table, this lets the frame be closed using the escape key like any other blizzard frame
 end
