@@ -133,6 +133,22 @@ function AugFramesLibrary:CreateClickableArea(areaIndex)
 
     areaFrame:SetNormalTexture(C_Spell.GetSpellTexture(areaDBSettings.spell)) -- Setting the normal texture, we need this for the cooldown/swipe to work
 
+    -- I can't think of any other way of doing this, I'm sure there will be however...
+    local lastUpdateTimestamp = 0
+    local lastUpdateInterval = 0.1 -- Basically 10fps, or 0.1ms
+    areaFrame:SetScript("OnUpdate", function(self, elapsed)
+        lastUpdateTimestamp = lastUpdateTimestamp + elapsed
+        if lastUpdateTimestamp >= lastUpdateInterval then
+            if C_Spell.IsSpellInRange(areaDBSettings.spell, areaDBSettings.unit) == false then
+                -- In range
+                areaFrame.Icon:SetDesaturated(false)
+            else
+                -- Out of range
+                areaFrame.Icon:SetDesaturated(true)
+            end
+        end
+    end)
+
     local statusHighlight = areaFrame:CreateTexture(nil, "HIGHLIGHT") -- Highlighted state texture
     statusHighlight:SetAllPoints() -- Setting the icon to cover the entire clickable area
     statusHighlight:SetTexture("Interface\\Buttons\\ButtonHilight-square") -- Setting the highlighted state texture to the default WoW square highlight texture
