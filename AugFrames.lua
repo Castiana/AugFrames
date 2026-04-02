@@ -36,6 +36,9 @@ function AugFrames:OnInitialize()
     AugFramesDBLibrary:Init()
     AugFramesDBLibrary:CheckDatabase()
 
+    -- Generate the context menus
+    AugFramesLibrary:GenerateContextMenus()
+
     -- Registering the slash commands
     AugFrames:RegisterChatCommand("augframes", function(msg) AugFramesLibrary:SlashCommand(msg) end) -- Registering the slash command. Took me a while to figure out how to pass this directly to the library function...
     AugFrames:RegisterChatCommand("af",  function(msg) AugFramesLibrary:SlashCommand(msg) end) -- Registering the shorter slash command. See above...

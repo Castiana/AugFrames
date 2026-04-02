@@ -348,7 +348,6 @@ function AugFramesLibrary:Main()
     -- This is the "main loop", it'll handle the frame setup/teardown based on the players spec
     if AugFramesDBLibrary:IsEnabled() == true then
         AugFramesDBLibrary:SetContextMenuStatus(false) -- Set this to false so we can generate the context menu
-        AugFramesLibrary:GenerateContextMenus() -- Generate the context menu options
         AugFramesLibrary:SetupFrames() -- If the addon is enabled, set up the frames
     else
         AugFramesLibrary:TeardownFrames() -- If the addon is disabled, tear down the frames
