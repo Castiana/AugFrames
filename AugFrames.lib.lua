@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: AugFrames.lib.lua
 -- Author: Sion Duncan
--- File Version: v1.1 
+-- File Version: v1.2 
 -- File purpose: Contains various functions used in other parts of the addon
 -- ######################################################
 
@@ -118,11 +118,7 @@ function AugFramesLibrary:CreateClickableArea(areaIndex)
         if k ~= "icon" then -- We don't want to set the icon as an attribute
             areaFrame:SetAttribute(k, v) -- Set the attribute on the clickable area
         elseif k == "unit" then
-            if v == "" or v == nil then
-                areaFrame:SetAttribute("unit", "player") -- This should NEVER be triggered, but rather have it than not incase something goes horribly wrong
-            else
-                areaFrame:SetAttribute("unit", areaDBSettings.unit) -- Targetting the spell
-            end
+            areaFrame:SetAttribute("unit", areaDBSettings.unit) -- Targetting the spell
         end
     end
 
