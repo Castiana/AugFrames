@@ -1,6 +1,8 @@
-## Interface: 120000, 120001, 120005, 120007
+## Interface: 120005, 120007
 ## Title: AugFrames
 ## Notes: Augmentation Evoker Helper Frames
+## Author: Sion Duncan
+## Version: @project-version@
 ## Category: Combat
 ## Category-deDE: Kampf
 ## Category-esES: Combate
@@ -12,12 +14,11 @@
 ## Category-ruRU: Бой
 ## Category-zhCN: 战斗
 ## Category-zhTW: 戰鬥
-## Author: Sion Duncan
-## Version: v1.4
 ## SavedVariables: AugFramesDB
 ## OptionalDeps: Ace3
 ## IconTexture: Interface\Icons\ability_evoker_augmentation
 ## X-Website: http://www.sionduncan.co.uk
+## X-Curse-Project-ID: 1458544
 
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
