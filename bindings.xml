@@ -5,4 +5,10 @@
     <Binding name="AUGFRAMES_PRESCINCE2" default="CTRL-SHIFT-2" category="AugFrames">
         AugFramesClickableArea2:Click()
     </Binding>
+    <Binding name="AUGFRAMES_BLISTERING_SCALES" default="CTRL-SHIFT-3" category="AugFrames">
+        AugFramesClickableArea3:Click()
+    </Binding>
+    <Binding name="AUGFRAMES_SPATIAL_VORTEX" default="CTRL-SHIFT-4" category="AugFrames">
+        AugFramesClickableArea4:Click()
+    </Binding>
 </Bindings>

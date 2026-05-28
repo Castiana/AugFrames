@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: enUS.lua
 -- Author: Sion Duncan
--- File Version: v1.4
+-- File Version: v1.5
 -- File purpose: Contains the English US variables
 -- ######################################################
 
@@ -27,8 +27,10 @@ if L then
 
 	L["SpellPrescience"] = "Prescience"
 
-	L["SpellPrescienceKeybind1"] = "Cast Prescience on Target 1"
-	L["SpellPrescienceKeybind2"] = "Cast Prescience on Target 2"
+	L["KeybindPrescience1"] = "Cast Prescience on Target 1"
+	L["KeybindPrescience2"] = "Cast Prescience on Target 2"
+	L["KeybindBlisteringScales"] = "Cast Blistering Scales on Target 3"
+	L["KeybindSpatialVortex"] = "Cast Spatial Vortex on Target 4"
 
 	L["EditModeOnlyShowPrescienceName"] = "Only Show Prescience Frames"
 	L["EditModeOnlyShowPrescienceTooltip"] = "Enable or disable only showing the Prescience Frames.\n\nWhen enabled, only the Prescience will be shown. This is for players who don't want the to show Blistering Scales and Spatial Vortex."

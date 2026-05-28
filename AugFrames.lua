@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: AugFrames.lua
 -- Author: Sion Duncan
--- File Version: v1.2
+-- File Version: v1.3
 -- File purpose: Primary lua file. I did write this in raw lua to start with,
 --               but I swapped to the Ace3 framework for ease.
 -- ######################################################
@@ -33,8 +33,10 @@ AugFramesOptionsLibrary = AugFramesOptionsLibrary or {} -- Make sure the library
 
 -- Keybinding Naming setup
 BINDING_HEADER_AUGFRAMES = AFL["AddonName"]
-BINDING_NAME_AUGFRAMES_PRESCINCE1 = AFL["SpellPrescienceKeybind1"]
-BINDING_NAME_AUGFRAMES_PRESCINCE2 = AFL["SpellPrescienceKeybind2"]
+BINDING_NAME_AUGFRAMES_PRESCINCE1 = AFL["KeybindPrescience1"]
+BINDING_NAME_AUGFRAMES_PRESCINCE2 = AFL["KeybindPrescience2"]
+BINDING_NAME_AUGFRAMES_BLISTERING_SCALES = AFL["KeybindBlisteringScales"]
+BINDING_NAME_AUGFRAMES_SPATIAL_VORTEX = AFL["KeybindSpatialVortex"]
 
 function AugFrames:OnInitialize()
     -- Initialise and sanity check our DB
