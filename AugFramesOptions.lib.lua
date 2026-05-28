@@ -47,7 +47,7 @@ function AugFramesOptionsLibrary:GenerateEditModeSettings()
             kind = AugFramesOptionsLibrary.EditMode.SettingType.Checkbox,
             default = true,
             get = function() return tmpDB.profile.smartPartyTargetting end,
-            set = function(info, value)
+            set = function(_, value)
                 tmpDB.profile.smartPartyTargetting = value
                 AugFramesDBLibrary:SetDB(tmpDB)
             end,
@@ -58,7 +58,7 @@ function AugFramesOptionsLibrary:GenerateEditModeSettings()
             kind = AugFramesOptionsLibrary.EditMode.SettingType.Checkbox,
             default = false,
             get = function() return tmpDB.profile.supressTargettingWarning end,
-            set = function(info, value)
+            set = function(_, value)
                 tmpDB.profile.supressTargettingWarning = value
                 AugFramesDBLibrary:SetDB(tmpDB)
             end,
@@ -76,6 +76,17 @@ function AugFramesOptionsLibrary:GenerateEditModeSettings()
             get = function() return tmpDB.profile.size end,
             set = function(_, value)
                 AugFramesOptionsLibrary:SaveEditModeSize(value)
+            end,
+        },
+        {
+            name = AFL["EditModeOnlyShowPrescienceName"],
+            tooltip = AFL["EditModeOnlyShowPrescienceTooltip"],
+            kind = AugFramesOptionsLibrary.EditMode.SettingType.Checkbox,
+            default = false,
+            get = function() return tmpDB.profile.onlyShowPrescience end,
+            set = function(_, value)
+                tmpDB.profile.onlyShowPrescience = value
+                AugFramesDBLibrary:SetDB(tmpDB)
             end,
         },
     }

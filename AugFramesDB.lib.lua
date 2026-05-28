@@ -59,6 +59,7 @@ function AugFramesDBLibrary:GetAugFramesDBDefaults()
             partyAutoTargetting = true, -- This is to control SmartTargetting when in a party
             supressTargettingWarning = false, -- Supress warnings when the player is the target
             generatedContextMenus = false, -- Used to track if we've generated our context menu options yet or not, so we don't generate them multiple times
+            onlyShowPrescience = false, -- Only show Prescience spell
             areaData = { -- This holds the configuration for the 4 clickable areas
                 [1] = { type = "spell", spell = "409311", name = AFL["SpellPrescience"] , unit = "player", playerName = "player", icon = 5199639, location = "TOPLEFT"}, -- Top Left
                 [2] = { type = "spell", spell = "409311", name = AFL["SpellPrescience"] , unit = "player", playerName = "player", icon = 5199639, location = "TOPRIGHT"}, -- Top Right

@@ -31,6 +31,11 @@ AugFramesLibrary = AugFramesLibrary or {} -- Make sure the library is global and
 AugFramesDBLibrary = AugFramesDBLibrary or {} -- Make sure the library is global and can be accessed by other files.
 AugFramesOptionsLibrary = AugFramesOptionsLibrary or {} -- Make sure the library is global and can be accessed by other files.
 
+-- Keybinding Naming setup
+BINDING_HEADER_AUGFRAMES = AFL["AddonName"]
+BINDING_NAME_AUGFRAMES_PRESCINCE1 = AFL["SpellPrescienceKeybind1"]
+BINDING_NAME_AUGFRAMES_PRESCINCE2 = AFL["SpellPrescienceKeybind2"]
+
 function AugFrames:OnInitialize()
     -- Initialise and sanity check our DB
     AugFramesDBLibrary:Init()

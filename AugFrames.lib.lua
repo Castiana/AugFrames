@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: AugFrames.lib.lua
 -- Author: Sion Duncan
--- File Version: v1.2 
+-- File Version: v1.4
 -- File purpose: Contains various functions used in other parts of the addon
 -- ######################################################
 
@@ -180,9 +180,15 @@ function AugFramesLibrary:SetupFrames()
     frameMain.Background:SetAllPoints() -- Setting the background to cover the entire frame
     frameMain.Background:SetColorTexture(0, 0, 0, 0.5) -- Setting the background color to black with 50% opacity
 
-   -- Now we have our "container" frame set up, we can start creating the clickable areas and attaching them to the main frame
-    for i = 1, 4 do
-        AugFramesLibrary:CreateClickableArea(i) -- Create the clickable area and attach it to the main frame
+    -- Now we have our "container" frame set up, we can start creating the clickable areas and attaching them to the main frame
+    if(tmpDB.profile.onlyShowPrescience) then
+        for i = 1, 2 do
+            AugFramesLibrary:CreateClickableArea(i) -- Create the clickable area and attach it to the main frame
+        end
+    else
+        for i = 1, 4 do
+            AugFramesLibrary:CreateClickableArea(i) -- Create the clickable area and attach it to the main frame
+        end
     end
 
     -- We can't initalise the EditMode configuration until we have our main frame. So we're doing that now.

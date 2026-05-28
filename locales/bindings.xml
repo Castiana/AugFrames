@@ -1,0 +1,8 @@
+<Bindings>
+    <Binding name="AUGFRAMES_PRESCINCE1" header="AugFrames" default="CTRL-SHIFT-1">
+        AugFramesClickableArea1:Click()
+    </Binding>
+    <Binding name="AUGFRAMES_PRESCINCE2" header="AugFrames" default="CTRL-SHIFT-2">
+        AugFramesClickableArea2:Click()
+    </Binding>
+</Bindings>

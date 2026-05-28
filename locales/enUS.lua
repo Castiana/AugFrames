@@ -26,6 +26,13 @@ if L then
 	L["SlashCurrentSpecID"] = "Current SpecID"
 
 	L["SpellPrescience"] = "Prescience"
+
+	L["SpellPrescienceKeybind1"] = "Cast Prescience on Target 1"
+	L["SpellPrescienceKeybind2"] = "Cast Prescience on Target 2"
+
+	L["EditModeOnlyShowPrescienceName"] = "Only Show Prescience Frames"
+	L["EditModeOnlyShowPrescienceTooltip"] = "Enable or disable only showing the Prescience Frames.\n\nWhen enabled, only the Prescience will be shown. This is for players who don't want the to show Blistering Scales and Spatial Vortex."
+
 	L["SpellBlisteringScales"] = "Blistering Scales"
 	L["SpellSpatialVortex"] = "Spatial Vortex"
 
