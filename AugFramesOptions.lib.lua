@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: AugFramesOptions.lib.lua
 -- Author: Sion Duncan
--- File Version: v2.0 
+-- File Version: v2.1 
 -- File purpose: Contains the Options Menu configuration and code
 -- ######################################################
 

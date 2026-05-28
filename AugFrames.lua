@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: AugFrames.lua
 -- Author: Sion Duncan
--- File Version: v1.1
+-- File Version: v1.2
 -- File purpose: Primary lua file. I did write this in raw lua to start with,
 --               but I swapped to the Ace3 framework for ease.
 -- ######################################################

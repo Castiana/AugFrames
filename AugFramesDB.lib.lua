@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: AugFrames.lib.lua
 -- Author: Sion Duncan
--- File Version: v1.0 
+-- File Version: v1.2 
 -- File purpose: Contains various functions used in other parts of the addon
 -- ######################################################
 

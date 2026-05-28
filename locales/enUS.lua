@@ -2,7 +2,7 @@
 -- Project: AugFrames
 -- File: enUS.lua
 -- Author: Sion Duncan
--- File Version: v1.1
+-- File Version: v1.4
 -- File purpose: Contains the English US variables
 -- ######################################################
 
@@ -10,8 +10,8 @@ local L = LibStub("AceLocale-3.0"):NewLocale("AugFrames", "enUS", true)
 
 if L then
 	L["AddonName"] = "AugFrames"
-	L["AddonVersionShort"] = "v1.1"
-	L["AddonVersionLong"] = "Addon Version: v1.1"
+	L["AddonVersionShort"] = "v1.4"
+	L["AddonVersionLong"] = "Addon Version: v1.4"
 	L["AddonDBVersion"] = "Database Version:"
 	L["AddonEnabled"] = "Enabled"
 	L["AddonDisabled"] = "Disabled"

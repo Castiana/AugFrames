@@ -1,4 +1,4 @@
-## Interface: 120000, 120001, 120005
+## Interface: 120000, 120001, 120005, 120007
 ## Title: AugFrames
 ## Notes: Augmentation Evoker Helper Frames
 ## Category: Combat
@@ -13,7 +13,7 @@
 ## Category-zhCN: 战斗
 ## Category-zhTW: 戰鬥
 ## Author: Sion Duncan
-## Version: v1.0
+## Version: v1.4
 ## SavedVariables: AugFramesDB
 ## OptionalDeps: Ace3
 ## IconTexture: Interface\Icons\ability_evoker_augmentation
