@@ -1,1 +1,7 @@
+package-as: AugFrames
+ignore:
+  - "- Non-Code Things"
+  - ".vscode"
+  - ".git*"
+  - ".pkgmeta"
 enable-toc-creation: yes
